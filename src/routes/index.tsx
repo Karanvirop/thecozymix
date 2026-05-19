@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/SiteLayout";
+import { ProductCard } from "@/components/ProductCard";
+import { PRODUCTS } from "@/lib/products";
 import hero from "@/assets/hero-bottle.jpg";
 
 export const Route = createFileRoute("/")({
@@ -53,12 +55,12 @@ function Home() {
           </div>
         </div>
 
-        <div className="relative h-[60vh] md:h-screen order-1 md:order-2">
+        <div className="relative aspect-[4/5] w-full max-h-[80vh] order-1 md:order-2">
           <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-background z-10 hidden md:block" />
           <img
             src={hero}
             alt="CozyMix Restorative Shampoo bottle in matte black with gold label"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             width={1280}
             height={1600}
           />
@@ -66,6 +68,16 @@ function Home() {
             <div className="tracking-luxury text-gold/80">250 ml</div>
             <div className="font-serif italic text-foreground/80 text-sm mt-1">Restorative Shampoo</div>
           </div>
+        </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
+        <div className="text-center mb-16">
+          <div className="tracking-luxury text-gold mb-4">Featured</div>
+          <h2 className="font-serif text-4xl md:text-5xl">The Collection</h2>
+        </div>
+        <div className="max-w-sm mx-auto md:max-w-md">
+          <ProductCard product={PRODUCTS["restorative-shampoo"]} />
         </div>
       </section>
 

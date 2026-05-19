@@ -12,18 +12,17 @@ export const Route = createFileRoute("/contact")({
   component: Contact,
 });
 
-const WHATSAPP = "https://wa.me/15555550123?text=" + encodeURIComponent("Hello CozyMix, I'd like to place an order for the Restorative Shampoo 250ml.");
-const INSTAGRAM = "https://instagram.com/cozymix";
+const WHATSAPP = "https://wa.me/9815534464?text=" + encodeURIComponent("Hello CozyMix, I'd like to place an order for the Restorative Shampoo 250ml.");
+const INSTAGRAM = "https://instagram.com/_cozymix_";
 
 function Contact() {
   return (
     <SiteLayout>
       <section className="max-w-4xl mx-auto px-6 md:px-12 py-24 text-center">
-        <div className="tracking-luxury text-gold mb-6">Maison CozyMix</div>
-        <h1 className="font-serif text-5xl md:text-7xl mb-8">In <em className="text-gold">conversation</em>.</h1>
+        <div className="tracking-luxury text-gold mb-6">The CozyMix</div>
+        <h1 className="font-serif text-5xl md:text-7xl mb-8">Place your <em className="text-gold">Order</em>.</h1>
         <p className="font-serif italic text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Orders, atelier visits, and quiet questions — we answer each one personally.
-          Reach us through WhatsApp for the fastest reply, or follow the ritual on Instagram.
+        Ready to order or just curious? Text us on WhatsApp or slide into our Instagram DMs — we're on both, and we reply to every message.
         </p>
 
         <div className="mt-16 grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
@@ -38,7 +37,7 @@ function Contact() {
             </svg>
             <div className="tracking-luxury text-muted-foreground mb-2">Order via</div>
             <div className="font-serif text-3xl group-hover:text-gold transition-colors">WhatsApp</div>
-            <div className="text-sm text-muted-foreground mt-3">Replies within the hour</div>
+            <div className="text-sm text-muted-foreground mt-3">Text us to place your order</div>
           </a>
 
           <a
@@ -54,17 +53,11 @@ function Contact() {
             </svg>
             <div className="tracking-luxury text-muted-foreground mb-2">Follow on</div>
             <div className="font-serif text-3xl group-hover:text-gold transition-colors">Instagram</div>
-            <div className="text-sm text-muted-foreground mt-3">@cozymix</div>
+            <div className="text-sm text-muted-foreground mt-3">@_cozymix_</div>
           </a>
         </div>
 
-        <div className="mt-24 pt-12 border-t border-border max-w-md mx-auto">
-          <div className="tracking-luxury text-gold mb-3">The Atelier</div>
-          <p className="font-serif italic text-foreground/80">
-            Open by appointment · Tuesday — Saturday<br />
-            care@cozymix.studio
-          </p>
-        </div>
+    
       </section>
     </SiteLayout>
   );

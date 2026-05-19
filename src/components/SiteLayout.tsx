@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ReactNode } from "react";
+import { CartNavButton } from "@/components/CartNavButton";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -29,12 +30,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
               </Link>
             ))}
           </nav>
-          <Link
-            to="/shop"
-            className="hidden md:inline-block tracking-luxury text-gold border border-gold px-5 py-2 hover:bg-gold hover:text-primary-foreground transition-all"
-          >
-            Shop
-          </Link>
+          <CartNavButton />
         </div>
       </header>
       <main className="flex-1 pt-20">{children}</main>
