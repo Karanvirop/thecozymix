@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ProductPricing } from "@/components/ProductPricing";
-import { ProductRating } from "@/components/ProductRating";
+import { ProductSizeSelector } from "@/components/ProductSizeSelector";
 import { useCart } from "@/context/CartContext";
 import { PRODUCTS } from "@/lib/products";
 import { cn } from "@/lib/utils";
@@ -10,10 +10,10 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
-      { title: "Shop — CozyMix Restorative Shampoo 250ml" },
+      { title: "Shop — CozyMix Restorative Shampoo" },
       {
         name: "description",
-        content: "Order the CozyMix Restorative Shampoo 250ml. Salon-grade, botanical, sulfate-free.",
+        content: "Order the CozyMix Restorative Shampoo. Salon-grade, botanical, sulfate-free.",
       },
       { property: "og:title", content: "Shop CozyMix Restorative Shampoo" },
     ],
@@ -25,13 +25,21 @@ const product = PRODUCTS["restorative-shampoo"];
 
 function Shop() {
   const [qty, setQty] = useState(1);
+  const [selectedSizeId, setSelectedSizeId] = useState<string | null>(null);
+  const [sizeError, setSizeError] = useState("");
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
 
-  const total = product.price * qty;
+  const selectedSize = product.sizes.find((size) => size.id === selectedSizeId);
+  const total = selectedSize ? selectedSize.price * qty : 0;
 
   const handleAddToCart = () => {
-    addItem(product.id, qty);
+    if (!selectedSizeId) {
+      setSizeError("Please select a size before adding to cart");
+      return;
+    }
+    setSizeError("");
+    addItem(product.id, selectedSizeId, qty);
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1500);
   };
@@ -61,16 +69,38 @@ function Shop() {
           <div className="md:pt-8">
             <div className="tracking-luxury text-gold mb-4">No. 01 · Hair</div>
             <h2 className="font-serif text-4xl md:text-5xl mb-2">{product.name}</h2>
-            <ProductRating product={product} size="lg" className="mb-3" />
 
             <p className="font-serif italic text-muted-foreground mb-6">{product.subtitle}</p>
 
-            <ProductPricing product={product} size="lg" className="mb-8" />
+            {selectedSize ? (
+              <ProductPricing
+                product={product}
+                price={selectedSize.price}
+                originalPrice={selectedSize.originalPrice}
+                size="lg"
+                className="mb-8"
+              />
+            ) : (
+              <ProductPricing product={product} showFromLabel size="lg" className="mb-8" />
+            )}
 
             <p className="text-muted-foreground leading-relaxed mb-8 max-w-md">
               A nightly ritual in a matte black bottle. Argan, rosemary and raw honey quietly rebuild
               what daily life has worn away. Lather. Linger. Restore.
             </p>
+
+            <div className="mb-8">
+              <div className="tracking-luxury text-muted-foreground mb-3">Size</div>
+              <ProductSizeSelector
+                sizes={product.sizes}
+                selectedSizeId={selectedSizeId}
+                onSelect={(sizeId) => {
+                  setSelectedSizeId(sizeId);
+                  setSizeError("");
+                }}
+              />
+              {sizeError && <p className="text-sm text-destructive mt-2">{sizeError}</p>}
+            </div>
 
             <div className="flex items-center gap-6 mb-8">
               <div className="tracking-luxury text-muted-foreground">Quantity</div>
@@ -103,7 +133,7 @@ function Shop() {
                   : "bg-gold text-primary-foreground hover:opacity-90",
               )}
             >
-              {added ? "Added to Cart" : `Add to Cart · ₹${total}`}
+              {added ? "Added to Cart" : selectedSize ? `Add to Cart · ₹${total}` : "Add to Cart"}
             </button>
 
             <Link

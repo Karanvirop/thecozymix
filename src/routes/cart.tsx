@@ -3,6 +3,8 @@ import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { SiteLayout } from "@/components/SiteLayout";
 import { ContactBuyDialog } from "@/components/ContactBuyDialog";
 import { useCart } from "@/context/CartContext";
+import { cartItemKey, formatCartItemDisplay } from "@/lib/products";
+
 export const Route = createFileRoute("/cart")({
   head: () => ({
     meta: [
@@ -14,8 +16,19 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const { items, totalItems, subtotal, shipping, total, removeItem, setQuantity, getProduct, hydrated } =
-    useCart();
+  const {
+    items,
+    totalItems,
+    subtotal,
+    shipping,
+    total,
+    removeItem,
+    setQuantity,
+    getProduct,
+    getItemUnitPrice,
+    getItemLineTotal,
+    hydrated,
+  } = useCart();
 
   const isEmpty = hydrated && items.length === 0;
 
@@ -40,9 +53,13 @@ function CartPage() {
               {items.map((item) => {
                 const product = getProduct(item.productId);
                 if (!product) return null;
+                const lineTotal = getItemLineTotal(item);
+                const unitPrice = getItemUnitPrice(item);
+                const itemKey = cartItemKey(item.productId, item.sizeId);
+
                 return (
                   <li
-                    key={item.productId}
+                    key={itemKey}
                     className="flex gap-4 md:gap-6 bg-card border border-border p-4 md:p-6 transition-all duration-300 animate-in fade-in slide-in-from-bottom-2"
                   >
                     <img
@@ -51,17 +68,19 @@ function CartPage() {
                       className="w-24 h-28 md:w-28 md:h-32 object-cover shrink-0"
                     />
                     <div className="flex-1 min-w-0 flex flex-col">
-                      <h2 className="font-serif text-xl md:text-2xl truncate">{product.name}</h2>
-                      <p className="text-sm text-muted-foreground font-serif italic truncate mt-0.5">
+                      <h2 className="font-serif text-xl md:text-2xl">
+                        {formatCartItemDisplay(product, item.sizeId, item.quantity)}
+                      </h2>
+                      <p className="text-sm text-muted-foreground font-serif italic mt-0.5">
                         {product.subtitle}
                       </p>
-                      <p className="font-serif text-gold text-lg mt-2">₹{product.price}</p>
+                      <p className="font-serif text-gold text-lg mt-2">₹{unitPrice} each</p>
 
                       <div className="mt-auto pt-4 flex items-center justify-between gap-4 flex-wrap">
                         <div className="flex items-center border border-border">
                           <button
                             type="button"
-                            onClick={() => setQuantity(item.productId, item.quantity - 1)}
+                            onClick={() => setQuantity(item.productId, item.sizeId, item.quantity - 1)}
                             className="w-9 h-9 text-gold hover:bg-secondary transition-colors"
                             aria-label="Decrease quantity"
                           >
@@ -70,7 +89,7 @@ function CartPage() {
                           <span className="w-10 text-center font-serif">{item.quantity}</span>
                           <button
                             type="button"
-                            onClick={() => setQuantity(item.productId, item.quantity + 1)}
+                            onClick={() => setQuantity(item.productId, item.sizeId, item.quantity + 1)}
                             className="w-9 h-9 text-gold hover:bg-secondary transition-colors"
                             aria-label="Increase quantity"
                           >
@@ -79,7 +98,7 @@ function CartPage() {
                         </div>
                         <button
                           type="button"
-                          onClick={() => removeItem(item.productId)}
+                          onClick={() => removeItem(item.productId, item.sizeId)}
                           className="flex items-center gap-2 text-xs tracking-luxury text-muted-foreground hover:text-destructive transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -87,9 +106,7 @@ function CartPage() {
                         </button>
                       </div>
                     </div>
-                    <p className="font-serif text-gold text-lg hidden sm:block shrink-0">
-                      ₹{product.price * item.quantity}
-                    </p>
+                    <p className="font-serif text-gold text-lg hidden sm:block shrink-0">₹{lineTotal}</p>
                   </li>
                 );
               })}
@@ -114,7 +131,7 @@ function EmptyCart() {
         Discover our restorative ritual — botanical, sulfate-free, poured in small batches.
       </p>
       <Link
-        to="/"
+        to="/shop"
         className="inline-block tracking-luxury bg-gold text-primary-foreground px-8 py-4 hover:opacity-90 transition-all"
       >
         Continue Shopping

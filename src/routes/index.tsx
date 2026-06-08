@@ -41,7 +41,7 @@ function Home() {
               to="/shop"
               className="tracking-luxury bg-gold text-primary-foreground px-8 py-4 hover:opacity-90 transition-all"
             >
-              Shop Now
+              Buy Now
             </Link>
             <Link to="/ingredients" className="tracking-luxury text-gold border-b border-gold pb-1">
               The Botanicals
@@ -49,9 +49,9 @@ function Home() {
           </div>
 
           <div className="mt-16 flex gap-12 text-xs tracking-luxury text-muted-foreground">
-            <div><div className="text-gold text-2xl font-serif normal-case tracking-normal">01</div>Sulfate Free</div>
-            <div><div className="text-gold text-2xl font-serif normal-case tracking-normal">02</div>Cold Pressed</div>
-            <div><div className="text-gold text-2xl font-serif normal-case tracking-normal">03</div>Salon Grade</div>
+            <div><div className="text-gold text-2xl font-serif normal-case tracking-normal"></div></div>
+            <div><div className="text-gold text-2xl font-serif normal-case tracking-normal"></div></div>
+            <div><div className="text-gold text-2xl font-serif normal-case tracking-normal"></div></div>
           </div>
         </div>
 
@@ -65,7 +65,7 @@ function Home() {
             height={1600}
           />
           <div className="absolute bottom-8 right-8 text-right z-20">
-            <div className="tracking-luxury text-gold/80">250 ml</div>
+            <div className="tracking-luxury text-gold/80"></div>
             <div className="font-serif italic text-foreground/80 text-sm mt-1">Restorative Shampoo</div>
           </div>
         </div>

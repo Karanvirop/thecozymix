@@ -1,34 +1,17 @@
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ProductPricing } from "@/components/ProductPricing";
-import { ProductRating } from "@/components/ProductRating";
-import { useCart } from "@/context/CartContext";
-import type { Product } from "@/lib/products";
+import { getLowestPrice, type Product } from "@/lib/products";
 import { cn } from "@/lib/utils";
 
 type ProductCardProps = {
   product: Product;
   className?: string;
-  originalPrice?: number;
-  rating?: number;
-  reviewCount?: number;
 };
 
 export function ProductCard({
   product,
   className,
-  originalPrice,
-  rating,
-  reviewCount,
 }: ProductCardProps) {
-  const { addItem } = useCart();
-  const [added, setAdded] = useState(false);
-
-  const handleAdd = () => {
-    addItem(product.id, 1);
-    setAdded(true);
-    window.setTimeout(() => setAdded(false), 1200);
-  };
+  const startingPrice = getLowestPrice(product);
 
   return (
     <article
@@ -53,29 +36,18 @@ export function ProductCard({
           <h3 className="font-serif text-2xl hover:text-gold transition-colors">{product.name}</h3>
         </Link>
 
-        <ProductRating
-          product={product}
-          rating={rating}
-          reviewCount={reviewCount}
-          className="mt-1 mb-1"
-        />
+        <p className="font-serif italic text-sm text-muted-foreground mb-2 mt-1">{product.subtitle}</p>
 
-        <p className="font-serif italic text-sm text-muted-foreground mb-3">{product.subtitle}</p>
+        <p className="text-xs tracking-widest text-muted-foreground mb-5">
+          Starts from <span className="font-serif text-gold">₹{startingPrice}</span>
+        </p>
 
-        <ProductPricing product={product} originalPrice={originalPrice} className="mb-5" />
-
-        <button
-          type="button"
-          onClick={handleAdd}
-          className={cn(
-            "mt-auto w-full tracking-luxury py-4 transition-all duration-300",
-            added
-              ? "bg-secondary text-gold border border-gold"
-              : "bg-gold text-primary-foreground hover:opacity-90",
-          )}
+        <Link
+          to="/shop"
+          className="mt-auto w-full tracking-luxury py-4 transition-all duration-300 bg-gold text-primary-foreground hover:opacity-90 text-center"
         >
-          {added ? "Added to Cart" : "Add to Cart"}
-        </button>
+          Buy Now
+        </Link>
       </div>
     </article>
   );

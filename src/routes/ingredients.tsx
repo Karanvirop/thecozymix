@@ -6,7 +6,7 @@ export const Route = createFileRoute("/ingredients")({
   head: () => ({
     meta: [
       { title: "Ingredients — CozyMix Botanical Formula" },
-      { name: "description", content: "Discover the organic botanicals behind CozyMix Restorative Shampoo: argan, rosemary, raw honey, lavender, shea." },
+      { name: "description", content: "Discover the organic botanicals behind CozyMix Restorative Shampoo: Shikakai · Amla · Reetha · Rosemary · Bhringraj · Methi Dana Flaxseed · Brahmi · Rose Petals · Hibiscus · Aloe Vera · Vitamin E · Glycerine" },
       { property: "og:title", content: "The Botanicals · CozyMix" },
     ],
   }),
@@ -14,24 +14,31 @@ export const Route = createFileRoute("/ingredients")({
 });
 
 const list = [
-  { n: "01", name: "Moroccan Argan Oil", note: "Cold-pressed from wild argan groves. Seals split ends with lipid-rich gold." },
-  { n: "02", name: "Mountain Rosemary", note: "Steam-distilled to wake the scalp and quiet the noise of the day." },
-  { n: "03", name: "Raw Wildflower Honey", note: "A natural humectant that draws moisture deep into the cuticle." },
-  { n: "04", name: "French Lavender", note: "A whisper of calm. Slow-grown in Provence, hand-bundled, sun-dried." },
-  { n: "05", name: "Unrefined Shea Butter", note: "Hand-churned from West African shea nuts. Velvet for the strand." },
-  { n: "06", name: "Black Sesame Extract", note: "Mineral-dense. Restores pigment depth and quiet vitality." },
+  { n: "01", name: "Shikakai", note: "A gentle natural cleanser that supports scalp health." },
+  { n: "02", name: "Amla", note: "Rich in vitamin C; strengthens and adds shine." },
+  { n: "03", name: "Reetha", note: "Soapnut extract for a soft, natural lather." },
+  { n: "04", name: "Rosemary", note: "Stimulates the scalp and supports healthy growth." },
+  { n: "05", name: "Bhringraj", note: "Traditional herb for hair vitality and thickness." },
+  { n: "06", name: "Methi Dana", note: "Fenugreek seeds that nourish and soften hair." },
+  { n: "07", name: "Flaxseed", note: "Omega-rich moisture for dry, brittle strands." },
+  { n: "08", name: "Brahmi", note: "Calms the scalp and supports root strength." },
+  { n: "09", name: "Rose Petals", note: "Adds a delicate floral note and gentle conditioning." },
+  { n: "10", name: "Hibiscus", note: "Helps maintain natural color and softness." },
+  { n: "11", name: "Aloe Vera", note: "Soothes and hydrates the scalp and hair." },
+  { n: "12", name: "Vitamin E", note: "Antioxidant protection for healthier-looking hair." },
+  { n: "13", name: "Glycerine", note: "Draws moisture in and helps prevent dryness." },
 ];
 
 function Ingredients() {
   return (
     <SiteLayout>
       <section className="relative h-[60vh] min-h-[400px] overflow-hidden">
-        <img src={img} alt="Botanical ingredients on charcoal stone" className="w-full h-full object-cover" width={1920} height={1080} />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/60" />
+        <img src={img} alt="Dried herbs and rose petals in a glass bowl" className="w-full h-full object-cover" width={1920} height={1280} />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/80" />
         <div className="absolute inset-0 flex items-center justify-center text-center px-6">
           <div>
             <div className="tracking-luxury text-gold mb-4">The Apothecary</div>
-            <h1 className="font-serif text-5xl md:text-7xl">Six Botanicals.<br /><em className="text-gold">One Ritual.</em></h1>
+            <h1 className="font-serif text-5xl md:text-7xl">13 Botanicals.<br /><em className="text-gold">One Ritual.</em></h1>
           </div>
         </div>
       </section>

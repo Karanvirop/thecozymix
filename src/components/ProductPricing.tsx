@@ -1,26 +1,29 @@
-import { getDiscountPercent, type Product } from "@/lib/products";
+import { getDiscountPercent, getLowestPrice, type Product } from "@/lib/products";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_ORIGINAL_PRICE = 450;
 
 type ProductPricingProps = {
   product: Product;
+  price?: number;
   originalPrice?: number;
+  showFromLabel?: boolean;
   size?: "sm" | "lg";
   className?: string;
 };
 
 export function ProductPricing({
   product,
+  price,
   originalPrice: originalPriceProp,
+  showFromLabel = false,
   size = "sm",
   className,
 }: ProductPricingProps) {
-  const salePrice = product.price;
-  const originalPrice =
-    originalPriceProp ?? product.originalPrice ?? DEFAULT_ORIGINAL_PRICE;
+  const salePrice = price ?? getLowestPrice(product);
+  const originalPrice = originalPriceProp ?? DEFAULT_ORIGINAL_PRICE;
   const discountPercent = getDiscountPercent(salePrice, originalPrice);
-  const showDiscount = discountPercent > 0;
+  const showDiscount = originalPriceProp !== undefined && discountPercent > 0;
 
   const saleClass = size === "lg" ? "font-serif text-4xl text-gold" : "font-serif text-2xl text-gold";
   const originalClass =
@@ -34,6 +37,9 @@ export function ProductPricing({
 
   return (
     <div className={cn("flex flex-wrap items-center gap-x-2 gap-y-1 leading-none", className)}>
+      {showFromLabel && (
+        <span className="text-muted-foreground text-sm tracking-widest self-end mb-1">From</span>
+      )}
       <span className={cn(saleClass, "leading-none")}>₹{salePrice}</span>
       {showDiscount && (
         <>

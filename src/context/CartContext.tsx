@@ -7,45 +7,64 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { PRODUCTS, SHIPPING_ESTIMATE, type Product } from "@/lib/products";
+import {
+  PRODUCTS,
+  SHIPPING_ESTIMATE,
+  formatWhatsAppLine,
+  getProductSize,
+  type Product,
+  type ProductSize,
+} from "@/lib/products";
 
 const STORAGE_KEY = "cozymix-cart";
 
 export type CartItem = {
   productId: string;
+  sizeId: string;
   quantity: number;
 };
 
 type CartContextValue = {
   items: CartItem[];
   hydrated: boolean;
-  addItem: (productId: string, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  setQuantity: (productId: string, quantity: number) => void;
+  addItem: (productId: string, sizeId: string, quantity?: number) => void;
+  removeItem: (productId: string, sizeId: string) => void;
+  setQuantity: (productId: string, sizeId: string, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
   subtotal: number;
   shipping: number;
   total: number;
   getProduct: (productId: string) => Product | undefined;
+  getItemSize: (productId: string, sizeId: string) => ProductSize | undefined;
+  getItemUnitPrice: (item: CartItem) => number;
+  getItemLineTotal: (item: CartItem) => number;
   formatCartSummary: () => string;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
 
+function isValidCartItem(item: unknown): item is CartItem {
+  if (!item || typeof item !== "object") return false;
+  const { productId, sizeId, quantity } = item as CartItem;
+  const product = PRODUCTS[productId];
+  return (
+    typeof productId === "string" &&
+    typeof sizeId === "string" &&
+    typeof quantity === "number" &&
+    quantity > 0 &&
+    !!product &&
+    !!getProductSize(product, sizeId)
+  );
+}
+
 function readStoredCart(): CartItem[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
-    const parsed = JSON.parse(raw) as CartItem[];
+    const parsed = JSON.parse(raw) as unknown[];
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (item) =>
-        typeof item.productId === "string" &&
-        typeof item.quantity === "number" &&
-        item.quantity > 0 &&
-        PRODUCTS[item.productId],
-    );
+    return parsed.filter(isValidCartItem);
   } catch {
     return [];
   }
@@ -65,31 +84,41 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items, hydrated]);
 
-  const addItem = useCallback((productId: string, quantity = 1) => {
-    if (!PRODUCTS[productId] || quantity < 1) return;
+  const addItem = useCallback((productId: string, sizeId: string, quantity = 1) => {
+    const product = PRODUCTS[productId];
+    if (!product || !getProductSize(product, sizeId) || quantity < 1) return;
     setItems((prev) => {
-      const existing = prev.find((i) => i.productId === productId);
+      const existing = prev.find((i) => i.productId === productId && i.sizeId === sizeId);
       if (existing) {
         return prev.map((i) =>
-          i.productId === productId ? { ...i, quantity: i.quantity + quantity } : i,
+          i.productId === productId && i.sizeId === sizeId
+            ? { ...i, quantity: i.quantity + quantity }
+            : i,
         );
       }
-      return [...prev, { productId, quantity }];
+      return [...prev, { productId, sizeId, quantity }];
     });
   }, []);
 
-  const removeItem = useCallback((productId: string) => {
-    setItems((prev) => prev.filter((i) => i.productId !== productId));
+  const removeItem = useCallback((productId: string, sizeId: string) => {
+    setItems((prev) =>
+      prev.filter((i) => !(i.productId === productId && i.sizeId === sizeId)),
+    );
   }, []);
 
-  const setQuantity = useCallback((productId: string, quantity: number) => {
-    if (!PRODUCTS[productId]) return;
+  const setQuantity = useCallback((productId: string, sizeId: string, quantity: number) => {
+    const product = PRODUCTS[productId];
+    if (!product || !getProductSize(product, sizeId)) return;
     if (quantity < 1) {
-      setItems((prev) => prev.filter((i) => i.productId !== productId));
+      setItems((prev) =>
+        prev.filter((i) => !(i.productId === productId && i.sizeId === sizeId)),
+      );
       return;
     }
     setItems((prev) =>
-      prev.map((i) => (i.productId === productId ? { ...i, quantity } : i)),
+      prev.map((i) =>
+        i.productId === productId && i.sizeId === sizeId ? { ...i, quantity } : i,
+      ),
     );
   }, []);
 
@@ -97,13 +126,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const getProduct = useCallback((productId: string) => PRODUCTS[productId], []);
 
+  const getItemSize = useCallback((productId: string, sizeId: string) => {
+    const product = PRODUCTS[productId];
+    if (!product) return undefined;
+    return getProductSize(product, sizeId);
+  }, []);
+
+  const getItemUnitPrice = useCallback((item: CartItem) => {
+    const size = getItemSize(item.productId, item.sizeId);
+    return size?.price ?? 0;
+  }, [getItemSize]);
+
+  const getItemLineTotal = useCallback(
+    (item: CartItem) => getItemUnitPrice(item) * item.quantity,
+    [getItemUnitPrice],
+  );
+
   const subtotal = useMemo(
-    () =>
-      items.reduce((sum, item) => {
-        const product = PRODUCTS[item.productId];
-        return sum + (product?.price ?? 0) * item.quantity;
-      }, 0),
-    [items],
+    () => items.reduce((sum, item) => sum + getItemLineTotal(item), 0),
+    [items, getItemLineTotal],
   );
 
   const totalItems = useMemo(
@@ -119,7 +160,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       .map((item) => {
         const product = PRODUCTS[item.productId];
         if (!product) return "";
-        return `${item.quantity} × ${product.name} (₹${product.price * item.quantity})`;
+        return formatWhatsAppLine(product, item.sizeId, item.quantity);
       })
       .filter(Boolean)
       .join("\n");
@@ -138,6 +179,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       shipping,
       total,
       getProduct,
+      getItemSize,
+      getItemUnitPrice,
+      getItemLineTotal,
       formatCartSummary,
     }),
     [
@@ -152,6 +196,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       shipping,
       total,
       getProduct,
+      getItemSize,
+      getItemUnitPrice,
+      getItemLineTotal,
       formatCartSummary,
     ],
   );
